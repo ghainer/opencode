@@ -19,6 +19,7 @@ import { Plugin } from "@/plugin"
 import { SystemPrompt } from "./system"
 import { ToolRegistry } from "@/tool/registry"
 import { Flag } from "@/flag/flag"
+import { glmXmlFallbackMiddleware, isGlmModel } from "./glm-xml-fallback"
 
 export namespace LLM {
   const log = Log.create({ service: "llm" })
@@ -193,6 +194,8 @@ export namespace LLM {
             },
           },
           extractReasoningMiddleware({ tagName: "think", startWithReasoning: false }),
+          // Add GLM XML fallback middleware for GLM models to handle vLLM parsing failures
+          ...(isGlmModel(input.model.id) ? [glmXmlFallbackMiddleware()] : []),
         ],
       }),
       experimental_telemetry: { isEnabled: cfg.experimental?.openTelemetry },
