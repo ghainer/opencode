@@ -20,6 +20,7 @@ import type { MessageV2 } from "./message-v2"
 import { Plugin } from "@/plugin"
 import { SystemPrompt } from "./system"
 import { Flag } from "@/flag/flag"
+import { glmXmlFallbackMiddleware, isGlmModel } from "./glm-xml-fallback"
 import { PermissionNext } from "@/permission/next"
 import { Auth } from "@/auth"
 
@@ -217,6 +218,8 @@ export namespace LLM {
             },
           },
           extractReasoningMiddleware({ tagName: "think", startWithReasoning: false }),
+          // Add GLM XML fallback middleware for GLM models to handle vLLM parsing failures
+          ...(isGlmModel(input.model.id) ? [glmXmlFallbackMiddleware()] : []),
         ],
       }),
       experimental_telemetry: { isEnabled: cfg.experimental?.openTelemetry },
