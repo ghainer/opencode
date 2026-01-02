@@ -17,9 +17,9 @@ import type { Agent } from "@/agent/agent"
 import type { MessageV2 } from "./message-v2"
 import { Plugin } from "@/plugin"
 import { SystemPrompt } from "./system"
-import { ToolRegistry } from "@/tool/registry"
 import { Flag } from "@/flag/flag"
 import { glmXmlFallbackMiddleware, isGlmModel } from "./glm-xml-fallback"
+import { PermissionNext } from "@/permission/next"
 
 export namespace LLM {
   const log = Log.create({ service: "llm" })
@@ -203,13 +203,11 @@ export namespace LLM {
   }
 
   async function resolveTools(input: Pick<StreamInput, "tools" | "agent" | "user">) {
-    const enabled = pipe(
-      input.agent.tools,
-      mergeDeep(await ToolRegistry.enabled(input.agent)),
-      mergeDeep(input.user.tools ?? {}),
-    )
-    for (const [key, value] of Object.entries(enabled)) {
-      if (value === false) delete input.tools[key]
+    const disabled = PermissionNext.disabled(Object.keys(input.tools), input.agent.permission)
+    for (const tool of Object.keys(input.tools)) {
+      if (input.user.tools?.[tool] === false || disabled.has(tool)) {
+        delete input.tools[tool]
+      }
     }
     return input.tools
   }
