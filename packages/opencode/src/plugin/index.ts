@@ -7,7 +7,7 @@ import { Server } from "../server/server"
 import { BunProc } from "../bun"
 import { Instance } from "../project/instance"
 import { Flag } from "../flag/flag"
-<<import { CodexAuthPlugin } from "./codex"
+import { CodexAuthPlugin } from "./codex"
 import { statusRegistry } from "../status/registry"
 
 export namespace Plugin {
