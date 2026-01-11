@@ -52,7 +52,6 @@ export namespace Bus {
     const pending = []
     for (const key of [def.type, "*"]) {
       const match = state().subscriptions.get(key)
-      console.log(`[Bus] Published event "${def.type}" for key "${key}", found ${match?.length ?? 0} subscribers`)
       for (const sub of match ?? []) {
         pending.push(sub(payload))
       }
@@ -91,10 +90,8 @@ export namespace Bus {
     log.info("subscribing", { type })
     const subscriptions = state().subscriptions
     let match = subscriptions.get(type) ?? []
-    console.log(`[Bus] Subscribing to "${type}", previous subscriber count: ${match.length}`)
     match.push(callback)
     subscriptions.set(type, match)
-    console.log(`[Bus] Subscribed to "${type}", new subscriber count: ${match.length}`)
 
     return () => {
       log.info("unsubscribing", { type })

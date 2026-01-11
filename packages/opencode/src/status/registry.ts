@@ -55,13 +55,8 @@ async function publishStatusUpdate() {
   try {
     const { Bus } = await import("../bus")
     const { TuiEvent } = await import("../cli/cmd/tui/event")
-    console.log(
-      `[StatusRegistry] Publishing status update with ${Object.keys(statusStore.items).length} items:`,
-      Object.keys(statusStore.items),
-    )
     Bus.publish(TuiEvent.StatusUpdated, { items: statusStore.items })
-  } catch (err) {
-    console.error(`[StatusRegistry] Error publishing status update:`, err)
+  } catch {
     // Ignore errors when context is not available (e.g., in tests)
   }
 }
@@ -73,12 +68,10 @@ export function register(item: StatusItem): StatusHandle {
     long: item.render.long(),
     short: item.render.short?.() ?? null,
   })
-  console.log(`[StatusRegistry] Plugin registered: ${item.id}, short null? ${item.render.short ? "no" : "yes"}`)
   publishStatusUpdate()
 
   return {
     update: ({ long, short }) => {
-      console.log(`[StatusRegistry] Status updated for: ${item.id}, long: ${!!long}, short: ${short !== undefined}`)
       setStatusStore((state) => {
         const existing = state.items[item.id]
         if (!existing) return state

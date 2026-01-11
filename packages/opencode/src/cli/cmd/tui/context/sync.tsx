@@ -114,7 +114,6 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
       switch (event.type) {
         case "tui.status.updated":
           // Forwarded from worker\'s Bus subscription via RPC
-          console.log("[Sync] Received plugin status update:", event.properties.items)
           setStore("pluginStatus", reconcile(event.properties.items))
           break
         case "server.instance.disposed":
