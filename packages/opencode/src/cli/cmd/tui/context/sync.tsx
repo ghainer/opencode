@@ -28,6 +28,9 @@ import { useArgs } from "./args"
 import { batch, onMount } from "solid-js"
 import { Log } from "@/util/log"
 import type { Path } from "@opencode-ai/sdk"
+import { TuiEvent } from "../event"
+import type { StatusState } from "@/status/registry"
+import { Bus } from "@/bus"
 
 export const { use: useSync, provider: SyncProvider } = createSimpleContext({
   name: "Sync",
@@ -73,6 +76,7 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
       formatter: FormatterStatus[]
       vcs: VcsInfo | undefined
       path: Path
+      pluginStatus: StatusState["items"]
     }>({
       provider_next: {
         all: [],
@@ -100,6 +104,7 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
       formatter: [],
       vcs: undefined,
       path: { state: "", config: "", worktree: "", directory: "" },
+      pluginStatus: {},
     })
 
     const sdk = useSDK()
@@ -305,6 +310,11 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
           break
         }
       }
+    })
+
+    // Listen for plugin status updates via TUI event bus
+    Bus.subscribe(TuiEvent.StatusUpdated, (evt) => {
+      setStore("pluginStatus", reconcile(evt.properties.items))
     })
 
     const exit = useExit()

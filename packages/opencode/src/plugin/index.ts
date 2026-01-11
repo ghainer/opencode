@@ -8,6 +8,7 @@ import { BunProc } from "../bun"
 import { Instance } from "../project/instance"
 import { Flag } from "../flag/flag"
 import { CodexAuthPlugin } from "./codex"
+import { statusRegistry } from "../status/registry"
 
 export namespace Plugin {
   const log = Log.create({ service: "plugin" })
@@ -32,6 +33,7 @@ export namespace Plugin {
       directory: Instance.directory,
       serverUrl: Server.url(),
       $: Bun.$,
+      status: statusRegistry,
     }
 
     for (const plugin of INTERNAL_PLUGINS) {
