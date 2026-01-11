@@ -33,6 +33,7 @@ process.on("uncaughtException", (e) => {
 
 // Subscribe to global events and forward them via RPC
 GlobalBus.on("event", (event) => {
+  console.log(`[Worker] Received event via GlobalBus:`, event.payload?.type)
   Rpc.emit("global.event", event)
 })
 
@@ -64,6 +65,7 @@ export const rpc = {
       init: InstanceBootstrap,
       fn: async () => {
         Bus.subscribeAll((event) => {
+          console.log("[Worker] Received event via Bus.subscribeAll:", event.type)
           Rpc.emit("event", event)
         })
         // Emit connected event
