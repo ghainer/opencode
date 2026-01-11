@@ -1,5 +1,5 @@
 import { Prompt, type PromptRef } from "@tui/component/prompt"
-import { createMemo, Match, onMount, Show, Switch } from "solid-js"
+import { createMemo, For, Match, onMount, Show, Switch } from "solid-js"
 import { useTheme } from "@tui/context/theme"
 import { useKeybind } from "@tui/context/keybind"
 import { Logo } from "../component/logo"
@@ -14,6 +14,7 @@ import { usePromptRef } from "../context/prompt"
 import { Installation } from "@/installation"
 import { useKV } from "../context/kv"
 import { useCommandDialog } from "../component/dialog-command"
+import type { StatusColor } from "@/status/registry"
 
 // TODO: what is the best way to do this?
 let once = false
@@ -36,6 +37,18 @@ export function Home() {
 
   const isFirstTimeUser = createMemo(() => sync.data.session.length === 0)
   const tipsHidden = createMemo(() => kv.get("tips_hidden", false))
+
+  const pluginStatus = createMemo(() => {
+    const items = Object.values(sync.data.pluginStatus)
+    return items
+      .filter((item) => item.short !== null)
+      .map((item) => ({
+        id: item.id,
+        render: item.short!,
+        priority: item.priority,
+      }))
+      .sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
+  })
   const showTips = createMemo(() => {
     // Don't show tips for first-time users
     if (isFirstTimeUser()) return false
@@ -129,6 +142,29 @@ export function Home() {
             </text>
             <text fg={theme.textMuted}>/status</text>
           </Show>
+          <For each={pluginStatus()}>
+            {(item) => {
+              const color = item.render.color ?? "default"
+              const colorMap = {
+                default: theme.text,
+                green: theme.success,
+                yellow: theme.warning,
+                red: theme.error,
+                blue: theme.info,
+                gray: theme.textMuted,
+              }
+              const textColor = colorMap[color]
+              return (
+                <text fg={textColor}>
+                  <span style={{ fg: textColor }}>
+                    {item.render.icon ?? ""}
+                    {item.render.icon ? " " : ""}
+                    {item.render.text}
+                  </span>
+                </text>
+              )
+            }}
+          </For>
         </box>
         <box flexGrow={1} />
         <box flexShrink={0}>
