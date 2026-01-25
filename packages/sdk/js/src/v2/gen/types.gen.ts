@@ -68,6 +68,31 @@ export type EventGlobalDisposed = {
   }
 }
 
+export type EventTuiStatusUpdated = {
+  type: "tui.status.updated"
+  properties: {
+    items: {
+      [key: string]: {
+        id: string
+        priority?: number
+        long: {
+          icon?: string
+          text: string
+          color?: "default" | "green" | "yellow" | "red" | "blue" | "gray"
+          detail?: string
+          progress?: number
+          subtext?: string
+        }
+        short: {
+          icon?: string
+          text: string
+          color?: "default" | "green" | "yellow" | "red" | "blue" | "gray"
+        } | null
+      }
+    }
+  }
+}
+
 export type EventLspClientDiagnostics = {
   type: "lsp.client.diagnostics"
   properties: {
@@ -888,6 +913,7 @@ export type Event =
   | EventServerInstanceDisposed
   | EventServerConnected
   | EventGlobalDisposed
+  | EventTuiStatusUpdated
   | EventLspClientDiagnostics
   | EventLspUpdated
   | EventFileEdited
@@ -4572,7 +4598,12 @@ export type TuiShowToastResponses = {
 export type TuiShowToastResponse = TuiShowToastResponses[keyof TuiShowToastResponses]
 
 export type TuiPublishData = {
-  body?: EventTuiPromptAppend | EventTuiCommandExecute | EventTuiToastShow | EventTuiSessionSelect
+  body?:
+    | EventTuiPromptAppend
+    | EventTuiStatusUpdated
+    | EventTuiCommandExecute
+    | EventTuiToastShow
+    | EventTuiSessionSelect
   path?: never
   query?: {
     directory?: string

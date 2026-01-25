@@ -112,6 +112,9 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
     sdk.event.listen((e) => {
       const event = e.details
       switch (event.type) {
+        case "tui.status.updated":
+          setStore("pluginStatus", reconcile(event.properties.items))
+          break
         case "server.instance.disposed":
           bootstrap()
           break
@@ -129,75 +132,6 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
           )
           break
         }
-
-        case "permission.asked": {
-          const request = event.properties
-          const requests = store.permission[request.sessionID]
-          if (!requests) {
-            setStore("permission", request.sessionID, [request])
-            break
-          }
-          const match = Binary.search(requests, request.id, (r) => r.id)
-          if (match.found) {
-            setStore("permission", request.sessionID, match.index, reconcile(request))
-            break
-          }
-          setStore(
-            "permission",
-            request.sessionID,
-            produce((draft) => {
-              draft.splice(match.index, 0, request)
-            }),
-          )
-          break
-        }
-
-        case "question.replied":
-        case "question.rejected": {
-          const requests = store.question[event.properties.sessionID]
-          if (!requests) break
-          const match = Binary.search(requests, event.properties.requestID, (r) => r.id)
-          if (!match.found) break
-          setStore(
-            "question",
-            event.properties.sessionID,
-            produce((draft) => {
-              draft.splice(match.index, 1)
-            }),
-          )
-          break
-        }
-
-        case "question.asked": {
-          const request = event.properties
-          const requests = store.question[request.sessionID]
-          if (!requests) {
-            setStore("question", request.sessionID, [request])
-            break
-          }
-          const match = Binary.search(requests, request.id, (r) => r.id)
-          if (match.found) {
-            setStore("question", request.sessionID, match.index, reconcile(request))
-            break
-          }
-          setStore(
-            "question",
-            request.sessionID,
-            produce((draft) => {
-              draft.splice(match.index, 0, request)
-            }),
-          )
-          break
-        }
-
-        case "todo.updated":
-          setStore("todo", event.properties.sessionID, event.properties.todos)
-          break
-
-        case "session.diff":
-          setStore("session_diff", event.properties.sessionID, event.properties.diff)
-          break
-
         case "session.deleted": {
           const result = Binary.search(store.session, event.properties.info.id, (s) => s.id)
           if (result.found) {
@@ -330,10 +264,11 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
       }
     })
 
-    // Listen for plugin status updates via TUI event bus
-    Bus.subscribe(TuiEvent.StatusUpdated, (evt) => {
-      setStore("pluginStatus", reconcile(evt.properties.items))
-    })
+    // Listen for plugin status updates via TUI event bus - moved to onMount to ensure it runs
+    // Bus.subscribe(TuiEvent.StatusUpdated, (evt) => {
+    //   console.log("[Sync] Received StatusUpdated event:", evt.properties.items)
+    //   setStore("pluginStatus", reconcile(evt.properties.items))
+    // })
 
     const exit = useExit()
     const args = useArgs()
@@ -399,6 +334,7 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
     })
 
     const fullSyncedSessions = new Set<string>()
+
     const result = {
       data: store,
       set: setStore,

@@ -5100,6 +5100,9 @@
                     "$ref": "#/components/schemas/Event.tui.prompt.append"
                   },
                   {
+                    "$ref": "#/components/schemas/Event.tui.status.updated"
+                  },
+                  {
                     "$ref": "#/components/schemas/Event.tui.command.execute"
                   },
                   {
@@ -5905,6 +5908,88 @@
           "properties": {
             "type": "object",
             "properties": {}
+          }
+        },
+        "required": ["type", "properties"]
+      },
+      "Event.tui.status.updated": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "tui.status.updated"
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "priority": {
+                      "type": "number"
+                    },
+                    "long": {
+                      "type": "object",
+                      "properties": {
+                        "icon": {
+                          "type": "string"
+                        },
+                        "text": {
+                          "type": "string"
+                        },
+                        "color": {
+                          "type": "string",
+                          "enum": ["default", "green", "yellow", "red", "blue", "gray"]
+                        },
+                        "detail": {
+                          "type": "string"
+                        },
+                        "progress": {
+                          "type": "number"
+                        },
+                        "subtext": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["text"]
+                    },
+                    "short": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "icon": {
+                              "type": "string"
+                            },
+                            "text": {
+                              "type": "string"
+                            },
+                            "color": {
+                              "type": "string",
+                              "enum": ["default", "green", "yellow", "red", "blue", "gray"]
+                            }
+                          },
+                          "required": ["text"]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": ["id", "long", "short"]
+                }
+              }
+            },
+            "required": ["items"]
           }
         },
         "required": ["type", "properties"]
@@ -8179,6 +8264,9 @@
           },
           {
             "$ref": "#/components/schemas/Event.global.disposed"
+          },
+          {
+            "$ref": "#/components/schemas/Event.tui.status.updated"
           },
           {
             "$ref": "#/components/schemas/Event.lsp.client.diagnostics"

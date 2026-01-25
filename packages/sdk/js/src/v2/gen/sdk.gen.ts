@@ -21,6 +21,7 @@ import type {
   EventTuiCommandExecute,
   EventTuiPromptAppend,
   EventTuiSessionSelect,
+  EventTuiStatusUpdated,
   EventTuiToastShow,
   ExperimentalResourceListResponses,
   FileListResponses,
@@ -2776,7 +2777,12 @@ export class Tui extends HeyApiClient {
   public publish<ThrowOnError extends boolean = false>(
     parameters?: {
       directory?: string
-      body?: EventTuiPromptAppend | EventTuiCommandExecute | EventTuiToastShow | EventTuiSessionSelect
+      body?:
+        | EventTuiPromptAppend
+        | EventTuiStatusUpdated
+        | EventTuiCommandExecute
+        | EventTuiToastShow
+        | EventTuiSessionSelect
     },
     options?: Options<never, ThrowOnError>,
   ) {
