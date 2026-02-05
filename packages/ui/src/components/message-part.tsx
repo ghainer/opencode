@@ -545,8 +545,8 @@ PART_MAPPING["tool"] = function ToolPartDisplay(props) {
 
   const questionRequest = createMemo(() => {
     const next = data.store.question?.[props.message.sessionID]?.[0]
-    if (!next || !next.tool) return undefined
-    if (next.tool!.callID !== part.callID) return undefined
+    if (!next) return undefined
+    if (next.tool && next.tool.callID !== part.callID) return undefined
     return next
   })
 

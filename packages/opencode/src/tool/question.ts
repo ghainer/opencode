@@ -24,7 +24,7 @@ export const QuestionTool = Tool.define("question", {
 
     return {
       title: `Asked ${params.questions.length} question${params.questions.length > 1 ? "s" : ""}`,
-      output: `User has answered your questions: ${formatted}. You can now continue with the user's answers in mind.`,
+      output: `User has answered your questions: ${formatted}. You can now continue with the user\'s answers in mind.`,
       metadata: {
         answers,
       },

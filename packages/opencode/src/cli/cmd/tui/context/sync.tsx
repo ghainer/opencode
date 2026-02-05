@@ -257,8 +257,22 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
           break
         }
 
-        case "vcs.branch.updated": {
-          setStore("vcs", { branch: event.properties.branch })
+        case "question.asked": {
+          setStore(
+            "question",
+            event.properties.sessionID,
+            (store.question[event.properties.sessionID] ?? []).concat([event.properties]),
+          )
+          break
+        }
+
+        case "question.replied":
+        case "question.rejected": {
+          setStore(
+            "question",
+            event.properties.sessionID,
+            (store.question[event.properties.sessionID] ?? []).filter((q) => q.id !== event.properties.requestID),
+          )
           break
         }
       }
